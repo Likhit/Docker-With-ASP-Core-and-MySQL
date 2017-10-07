@@ -6,7 +6,8 @@
         "**/CVS": true,
         "**/.DS_Store": true,
         "**/[Bb]in": true,
-        "**/[Oo]bj": true
+        "**/[Oo]bj": true,
+        "**/[Pp]ublish": true
     },
     "files.associations": {
         "*.dockerfile": "dockerfile"

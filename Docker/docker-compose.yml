@@ -1,0 +1,51 @@
+version: '3'
+services:
+  webapp:
+    container_name: webapp.test
+    image: webapp:${WEBAPP_VERSION}
+    build:
+      context: ../
+      dockerfile: ./Docker/App.dockerfile
+      args:
+        WEBAPP_VERSION: ${WEBAPP_VERSION}
+        URL_PORT: ${URL_PORT}
+    ports:
+      - "5000:${URL_PORT}"
+    volumes:
+      - appbuild:/app
+    links:
+      - mysql
+    environment:
+      MYSQL_SERVER_NAME: ${MYSQL_SERVER_NAME}
+    env_file:
+      - secrets.env
+    depends_on:
+      - builder
+  
+  builder:
+    container_name: builder
+    image: webapp:${BUILDER_VERSION}.${BUILD_CONFIG}
+    build:
+      context: ../
+      dockerfile: ./Docker/Build.dockerfile
+      args:
+        BUILDER_VERSION: ${BUILDER_VERSION}
+        BUILD_CONFIG: ${BUILD_CONFIG}
+        BUILD_LOCATION: ${BUILD_LOCATION}
+    volumes:
+      - appbuild:${BUILD_LOCATION}
+   
+  mysql:
+    container_name: ${MYSQL_SERVER_NAME}
+    image: mysql/mysql-server:5.7
+    restart: always
+    volumes:
+      - dbvol:/var/lib/mysql
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: !!str yes
+    env_file:
+      - secrets.env
+
+volumes:
+  appbuild:
+  dbvol:
